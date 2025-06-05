@@ -1,4 +1,3 @@
-.env
-messages.js
-oldstyles.css
-newstyles.css
+scripts.js
+env.js
+env.ts

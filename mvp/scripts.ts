@@ -1,3 +1,7 @@
+import { config } from "./env.js";
+
+const API_URL = config.API_URL;
+
 interface messageData{
     id:number;
     username:string;
@@ -53,7 +57,7 @@ function createmessage(name:string,body:string,timestamp:string):HTMLDivElement 
 }
 
 async function getmessageAPI():Promise<messagesData> {
-    const res:Response= await fetch(process.env.API_URL+"messages")
+    const res:Response= await fetch(API_URL+"messages")
     if (res.ok) {
         const data:messagesData= await res.json();
 
@@ -69,7 +73,7 @@ async function getmessageAPI():Promise<messagesData> {
 async function sendmessageAPI() {
     let content:string = divcontent.value;
     let username:string = divusername.value;
-    const comment:Response = await fetch(process.env.API_URL+"message",{        
+    const comment:Response = await fetch(API_URL+"message",{        
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
@@ -84,20 +88,6 @@ async function sendmessageAPI() {
     })
     console.log("aled");  
 }
-
-function formattedtime(date:Date) {
-    const months:string[]= ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const year:number = date.getFullYear();
-    const month:string = months[date.getMonth()];
-    const day:number = date.getDate();
-    const hour:number = date.getHours();
-    const min:number = date.getMinutes();
-    const sec:number = date.getSeconds();
-    const formattedtime:string = day + " " + month + " " + year + " " + hour + "h "+ min + "min " + sec + "sec";
-
-    return formattedtime;
-}
-
 
 submit.addEventListener("click",async (e:Event)=>{
     e.preventDefault();
