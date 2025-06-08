@@ -5,6 +5,7 @@ body {
     margin: 40px auto;
     padding: 20px;
     border-radius: 8px;
+    max-width: 800px;
 }
 
 h1, h2 {
@@ -47,7 +48,7 @@ button:hover {
 
 ul {
     list-style: none;
-    padding: 0;
+    padding: 0;   
 }
 
 li {
@@ -59,11 +60,15 @@ li {
 }
 
 .msg-date {
-    float: right;
     font-size: 0.85rem;
     color: #777;
 }
  
+.msg-likes {
+    font-size: 0.85rem;
+    color: #777;
+}
+
 .msg-name {
     font-weight: 600;
     font-size: 1rem;
@@ -80,4 +85,32 @@ p {
     font-size: 1rem;
     color: #555;
     text-align: center;
+}
+
+.msg-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #777;
+    margin-bottom: 8px;
+}
+
+.msg-body {
+    text-align: center;
+    font-size: 1rem;
+    color: #555;
+}
+
+.messages-list {
+  background: linear-gradient(135deg, #f0f4ff 0%, #d9e4ff 100%);
+  padding: 24px;             
+  border-radius: 12px;       
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom: 32px;       
+  border: 2px dashed #aac;
+  transition: background 0.3s ease;
+}
+
+.messages-container:hover {
+  background: linear-gradient(135deg, #e0e7ff, #bcd2ff);
 }
