@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>EKLOR</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body id="body">
+    <h1>Forum des Commentaires</h1>
+    <p><em>Entrez un commentaire ci-dessous :</em></p>
+    <form id="message-form">
+        <input type="text" id="username" placeholder="Votre pseudo" required>
+        <textarea id="message" placeholder="Votre message" required></textarea>
+        <button type="submit" id="submit">Publier</button>
+    </form>
+
+
+    <h2>Les précédents Postes !</h2>
+    <ul id="messages-list" class="messages-list"></ul>
+
+    <button id="loadmore" class="loadmore"> Plus de message ?</button>
+    <script type="module" src="./scripts.js"></script>
+</body>
+</html>
