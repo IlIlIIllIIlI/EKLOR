@@ -14,11 +14,28 @@
         <button type="submit" id="submit">Publier</button>
     </form>
 
+    <div id="message-detail-view">
+        <div id="message-detail"></div>
+        
+        <h3>Commentaires</h3>
+        <div id="comments-container"></div>
+        
+        <form id="comment-form">
+            <input type="text" id="comment-username" placeholder="Votre pseudo" required>
+            <textarea id="comment-content" placeholder="Votre commentaire" required></textarea>
+            <button type="submit" id="submit-com">Ajouter un commentaire</button>
+        </form>
+    </div>
 
+    <button id="back-button" style="display: none;">← Retour aux messages</button>
+
+
+    <div id="main-feed">
     <h2>Les précédents Postes !</h2>
     <ul id="messages-list" class="messages-list"></ul>
-
     <button id="loadmore" class="loadmore"> Plus de message ?</button>
+    </div>
+
     <script type="module" src="./scripts.js"></script>
 </body>
 </html>

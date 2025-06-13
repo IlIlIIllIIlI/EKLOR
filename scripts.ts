@@ -28,9 +28,18 @@ const divusername:HTMLInputElement=document.getElementById("username") as HTMLIn
 const container:HTMLUListElement = document.getElementById("messages-list") as HTMLUListElement
 const submit:HTMLButtonElement= document.getElementById("submit") as HTMLButtonElement;
 const loadMore:HTMLButtonElement= document.getElementById("loadmore") as HTMLButtonElement;
+const goBack:HTMLDivElement= document.getElementById("back-button") as HTMLDivElement;
+const messageDetail:HTMLDivElement= document.getElementById("message-detail") as HTMLDivElement;
+const comments:HTMLDivElement= document.getElementById("comments-container") as HTMLDivElement;
+const commentForm:HTMLFormElement=document.getElementById("comment-form") as HTMLFormElement;
+const commentContent:HTMLTextAreaElement=document.getElementById("comment-content") as HTMLTextAreaElement;
+const commentUsername:HTMLInputElement= document.getElementById("comment-username") as HTMLInputElement;
+const submitCom:HTMLButtonElement= document.getElementById("submit-com") as HTMLButtonElement;
+
 
 let pageLoaded:number=1;
 let lock:boolean=false;
+let currentMainMessageId:number|null=null
 async function displaymessageAPI():Promise<void> {
     if (lock) {
         return
@@ -41,7 +50,7 @@ async function displaymessageAPI():Promise<void> {
     const data:messagesData=await getMessageAPI(pageLoaded);
 
     if (data != undefined) {
-        for (let i = 0; i <29; i++) {
+        for (let i = 0; i <data.data.length; i++) {
             if (data.data[i]=== undefined) {
                 const end:HTMLDivElement=document.createElement("div");
                 end.textContent="C'est tout"
@@ -49,7 +58,7 @@ async function displaymessageAPI():Promise<void> {
                 loadMore.hidden=true;
                 return;
             } else {
-                const comments:messagesData= await getCommentAPI(data.data[i].id)
+                const comments:messagesData= await getCommentsAPI(data.data[i].id,1)
                 const pfp:pfpdata= await getPfpAPI(data.data[i].username)
                 const newmessage:HTMLDivElement= createmessage(data.data[i].id,pfp.avatar,data.data[i].username,data.data[i].content,data.data[i].created_at,data.data[i].like,comments.total)
                 container.appendChild(newmessage);
@@ -64,6 +73,37 @@ async function displaymessageAPI():Promise<void> {
     pageLoaded++
     lock =false
 }
+
+async function displayCommentsAPI(id:number,total:number) {
+ 
+    comments.innerHTML="";
+   
+    for (let i = 1; i <=total; i++) {
+        const data:messagesData=await getCommentsAPI(id,i);
+
+        if (data != undefined) {
+        for (let j = 0; j <data.data.length; j++) {
+            if (data.data[j]=== undefined) {
+                const end:HTMLDivElement=document.createElement("div");
+                end.textContent="C'est tout"
+                bodyElement.appendChild(end);
+                return;
+            } else {
+                const newcomment:HTMLDivElement= createComment(data.data[j].id,data.data[j].username,data.data[j].content,data.data[j].created_at)
+                comments.appendChild(newcomment);
+
+            }
+           
+
+            
+            
+        }
+    }
+        
+    }
+
+}
+
 
 function createmessage(id:number, pfp:URL,name:string,body:string,timestamp:string,like:number,commentCount:number):HTMLDivElement {
     const message:HTMLDivElement = document.createElement("div");
@@ -87,11 +127,14 @@ function createmessage(id:number, pfp:URL,name:string,body:string,timestamp:stri
     likespan.textContent="🖤   "+ String(like)
     metadiv.classList.add("msg-meta")
     commentspan.textContent="💬   "+ String(commentCount)
-    commentspan.classList.add("message-com")
+    commentspan.classList.add("msg-com")
     pfppic.src=String(pfp);
     pfppic.classList.add("img")
 
     
+        
+        
+   
     metadiv.appendChild(likespan);
     metadiv.appendChild(commentspan);
     metadiv.appendChild(timestampspan);
@@ -99,9 +142,43 @@ function createmessage(id:number, pfp:URL,name:string,body:string,timestamp:stri
     message.appendChild(namep);
     message.appendChild(bodyp);
     message.appendChild(metadiv)
+   
     
     return message;
 
+}
+
+function createComment(id:number,name:string,body:string,timestamp:string):HTMLDivElement {
+    const comment:HTMLDivElement = document.createElement("div");
+    const namep:HTMLParagraphElement = document.createElement("p");
+    const timestampspan:HTMLSpanElement = document.createElement("span");
+    const bodyp:HTMLParagraphElement = document.createElement("p");
+    const likespan:HTMLSpanElement = document.createElement("span"); 
+    const metadiv:HTMLDivElement=document.createElement("div"); 
+    const commentspan:HTMLSpanElement= document.createElement("span");
+    const pfppic:HTMLImageElement=document.createElement("img");
+    
+    comment.dataset.id=String(id);
+    comment.classList.add("message");
+    namep.textContent = name;
+    namep.classList.add("msg-name");
+    timestampspan.textContent = format_date(timestamp)
+    timestampspan.classList.add("msg-date");
+    bodyp.classList.add("msg-body");
+    bodyp.textContent= body;
+    metadiv.classList.add("msg-meta")
+
+    
+        
+        
+   
+    metadiv.appendChild(timestampspan);
+    comment.appendChild(namep);
+    comment.appendChild(bodyp);
+    comment.appendChild(metadiv)
+   
+    
+    return comment;
 }
 
 async function getMessageAPI(page:number):Promise<messagesData> {
@@ -121,9 +198,7 @@ async function getMessageAPI(page:number):Promise<messagesData> {
     }
 }
 
-async function sendMessageAPI() {
-    let content:string = divcontent.value;
-    let username:string = divusername.value;
+async function sendMessageAPI(content:string,username:string) {
     const message:Response = await fetch(API_URL+"message",{        
         method: 'POST',
         headers: {
@@ -139,9 +214,10 @@ async function sendMessageAPI() {
     })
 }
 
-async function getCommentAPI(id:number):Promise<messagesData> {
+async function getCommentsAPI(id:number,page:number):Promise<messagesData> {
     const params:URLSearchParams=new URLSearchParams()
-    params.append("message_id",String(id))
+    params.append("message_id",String(id),)
+    params.append("page",String(page))
     const res:Response= await fetch(`${API_URL}comments?${params}`)
      if (res.ok) {
         const data:messagesData= await res.json();   
@@ -261,10 +337,10 @@ function replace(expr:string,to_replace:string,replace_with:string):string{
         if (counter===to_replace.length) {
                 if (replace===to_replace) {
                 
-                        res=res+replace_with;
+                    res=res+replace_with;
                         
-                        replace="";
-                        counter=0;
+                    replace="";
+                    counter=0;
 
                         
                 }  else {
@@ -315,37 +391,155 @@ function updateLike(like:string):string {
 }
 
 
+async function showMessageDetails(messageId:number) {
+
+    const mainFeed:HTMLDivElement=document.getElementById("main-feed") as HTMLDivElement;
+    const messageDetailView = document.getElementById("message-detail-view") as HTMLDivElement;
+
+    container.parentElement!.style.display ="none"
+    loadMore.style.display="none"
+
+    mainFeed.style.display="none"
+
+    messageDetail.innerHTML="";
+    comments.innerHTML="";
+
+    messageDetailView.style.display="block"
+    messageDetail.style.display = "block";
+    comments.style.display = "block";
+    goBack.style.display = "block";
+    commentForm.style.display = "block"
+
+    currentMainMessageId = messageId;
+
+    for (let i = 1; i <=pageLoaded; i++) {
+        const data:messagesData= await getMessageAPI(i)
+        for (let j = 0; j < data.data.length; j++) {
+      
+            if (data.data[j]=== undefined) {
+                console.log("error ???");
+                return;
+            }
+
+            if (data.data[j].id===messageId) {
+                const comments:messagesData= await getCommentsAPI(data.data[j].id,1)
+                const pfp:pfpdata= await getPfpAPI(data.data[j].username)
+                const message:HTMLDivElement= createmessage(data.data[j].id,pfp.avatar,data.data[j].username,data.data[j].content,data.data[j].created_at,data.data[j].like,comments.total)
+                messageDetail.appendChild(message);
+                displayCommentsAPI(data.data[j].id,data.total);
+                console.log("done");
+                
+
+                return;
+
+
+            }
+        }
+        
+    }
+
+    console.log("error ???");
+    return;
+
+}
+
+function showMessages() {
+    const mainFeed:HTMLDivElement=document.getElementById("main-feed") as HTMLDivElement;
+    const messageDetailView = document.getElementById("message-detail-view") as HTMLDivElement;
+
+    container.parentElement!.style.display ="block"
+    loadMore.style.display="block"
+
+    mainFeed.style.display="block"
+
+    messageDetail.innerHTML="";
+    comments.innerHTML="";
+
+    messageDetailView.style.display="none"
+    messageDetail.style.display = "none";
+    comments.style.display = "none";
+    goBack.style.display = "none";
+    commentForm.style.display = "none"
+
+    currentMainMessageId = null;
+}
 
 submit.addEventListener("click",async (e:Event)=>{
     e.preventDefault();
-    sendMessageAPI();
+    sendMessageAPI(divcontent.value,divusername.value);
 });
 
 
 container.addEventListener("click",async (e:Event)=>{
     const target:HTMLUListElement =e.target as HTMLUListElement
-    const likeElement:HTMLButtonElement = target.closest(".msg-likes") as HTMLButtonElement
-    if (likeElement ===undefined) {
-     console.log("oops");
-     
-    }else{
-        const messageElement:HTMLDivElement= target.closest(".message") as HTMLDivElement;
+    const message:HTMLDivElement=target.closest(".message") as HTMLDivElement;
+
+    if (target.closest(".msg-likes")!=null) {
+        const likeElement:HTMLSpanElement = target.closest(".msg-likes") as HTMLSpanElement
         likeElement.classList.remove("msg-likes")
         likeElement.classList.add("msg-likes-clicked")
-        likeMessageApi(Number(messageElement.dataset.id))
+        likeMessageApi(Number(message.dataset.id))
         likeElement.textContent=updateLike(String(likeElement.textContent))
+        return;
+    }
+
+    if (target.closest(".msg-com")!=null) {
+        if (!isNaN(Number(message.dataset.id))) {
+            await showMessageDetails(Number(message.dataset.id))
+        }
+        
+        
+         return;
+    }   
+
+    if (target.closest(".msg-body")) {
+        if (!isNaN(Number(message.dataset.id))) {
+            await showMessageDetails(Number(message.dataset.id))
+        }
+        
+    }
 
     }
-})
+    
+)
 
+messageDetail.addEventListener("click", async (e:Event)=>{
+    const target:HTMLDivElement =e.target as HTMLDivElement
+    const message:HTMLDivElement=target.closest(".message") as HTMLDivElement;
+
+    if (target.closest(".msg-likes")!=null) {
+        const likeElement:HTMLSpanElement = target.closest(".msg-likes") as HTMLSpanElement
+        likeElement.classList.remove("msg-likes")
+        likeElement.classList.add("msg-likes-clicked")
+        likeMessageApi(Number(message.dataset.id))
+        likeElement.textContent=updateLike(String(likeElement.textContent))
+        return;
+    }
+});
 
 loadMore.addEventListener("click", async (e:Event)=>{
     displaymessageAPI()
 })
 
 
+submitCom.addEventListener("click",async (e:Event)=>{
+    e.preventDefault();
 
+    if (currentMainMessageId!=null) {
+        await addCommentAPI(currentMainMessageId,commentUsername.value,commentContent.value)
+        commentUsername.value=""
+        commentContent.value=""
+        const commentsData = await getCommentsAPI(currentMainMessageId, 1);
+        displayCommentsAPI(currentMainMessageId,commentsData.total);
+        console.log("done");
+        
+    }
+    
+});
 
+goBack.addEventListener("click",(e:Event)=>{
+    showMessages();
+})
 
 
 
