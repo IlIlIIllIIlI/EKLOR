@@ -6,8 +6,8 @@
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body id="body">
-    <h1>Forum des Commentaires</h1>
-    <p><em>Entrez un commentaire ci-dessous :</em></p>
+    <h1>EKLOR</h1>
+    <p><em>Ajouter un Post ci-dessous :</em></p>
     <form id="message-form">
         <input type="text" id="username" placeholder="Votre pseudo" required>
         <textarea id="message" placeholder="Votre message" required></textarea>
@@ -21,19 +21,19 @@
         <div id="comments-container"></div>
         
         <form id="comment-form">
-            <input type="text" id="comment-username" placeholder="Votre pseudo" required>
-            <textarea id="comment-content" placeholder="Votre commentaire" required></textarea>
-            <button type="submit" id="submit-com">Ajouter un commentaire</button>
+            <input type="text" id="comment-username" class="comment-username" placeholder="Votre pseudo" required>
+            <textarea id="comment-content" class="comment-content" placeholder="Votre commentaire" required></textarea>
+            <button type="submit" id="submit-com" class="submit-com">Ajouter un commentaire</button>
         </form>
     </div>
 
-    <button id="back-button" style="display: none;">← Retour aux messages</button>
+    <button id="back-button" style="display: none;">← Retour aux Posts</button>
 
 
     <div id="main-feed">
     <h2>Les précédents Postes !</h2>
     <ul id="messages-list" class="messages-list"></ul>
-    <button id="loadmore" class="loadmore"> Plus de message ?</button>
+    <button id="loadmore" class="loadmore"> Plus de Message ?</button>
     </div>
 
     <script type="module" src="./scripts.js"></script>
