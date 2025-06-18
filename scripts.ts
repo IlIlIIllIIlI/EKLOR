@@ -59,6 +59,15 @@ const commentUsername: HTMLInputElement = document.getElementById(
 const submitCom: HTMLButtonElement = document.getElementById(
     "submit-com"
 ) as HTMLButtonElement;
+const mainFeed: HTMLDivElement = document.getElementById(
+    "main-feed"
+) as HTMLDivElement;
+const messageDetailView = document.getElementById(
+    "message-detail-view"
+) as HTMLDivElement;
+const messageForm:HTMLFormElement=document.getElementById(
+    "message-form"
+) as HTMLFormElement;
 
 let pageLoaded: number = 1;
 let lock: boolean = false;
@@ -138,36 +147,39 @@ function createmessage(
 ): HTMLDivElement {
     const message: HTMLDivElement = document.createElement("div");
     const namep: HTMLParagraphElement = document.createElement("p");
-    const timestampspan: HTMLSpanElement = document.createElement("span");
+    const timestampSpan: HTMLSpanElement = document.createElement("span");
     const bodyp: HTMLParagraphElement = document.createElement("p");
-    const likespan: HTMLSpanElement = document.createElement("span");
-    const metadiv: HTMLDivElement = document.createElement("div");
-    const commentspan: HTMLSpanElement = document.createElement("span");
-    const pfppic: HTMLImageElement = document.createElement("img");
+    const likeSpan: HTMLSpanElement = document.createElement("span");
+    const metaDiv: HTMLDivElement = document.createElement("div");
+    const commentSpan: HTMLSpanElement = document.createElement("span");
+    const pfpPic: HTMLImageElement = document.createElement("img");
+    const interactionsDiv: HTMLDivElement = document.createElement("div"); 
 
     message.dataset.id = String(id);
     message.classList.add("message");
     namep.textContent = name;
     namep.classList.add("msg-name");
-    timestampspan.textContent = format_date(timestamp);
-    timestampspan.classList.add("msg-date");
+    timestampSpan.textContent = format_date(timestamp);
+    timestampSpan.classList.add("msg-date");
     bodyp.classList.add("msg-body");
     bodyp.textContent = body;
-    likespan.classList.add("msg-likes");
-    likespan.textContent = "🖤   " + String(like);
-    metadiv.classList.add("msg-meta");
-    commentspan.textContent = "💬   " + String(commentCount);
-    commentspan.classList.add("msg-com");
-    pfppic.src = String(pfp);
-    pfppic.classList.add("img");
+    likeSpan.classList.add("msg-likes");
+    likeSpan.textContent = "🖤   " + String(like);
+    metaDiv.classList.add("msg-meta");
+    commentSpan.textContent = "💬   " + String(commentCount);
+    commentSpan.classList.add("msg-com");
+    pfpPic.src = String(pfp);
+    pfpPic.classList.add("img");
+    interactionsDiv.classList.add("msg-interactions");
 
-    metadiv.appendChild(likespan);
-    metadiv.appendChild(commentspan);
-    metadiv.appendChild(timestampspan);
-    message.appendChild(pfppic);
+    interactionsDiv.appendChild(likeSpan);
+    interactionsDiv.appendChild(commentSpan)
+    metaDiv.appendChild(interactionsDiv)
+    metaDiv.appendChild(timestampSpan);
+    message.appendChild(pfpPic);
     message.appendChild(namep);
     message.appendChild(bodyp);
-    message.appendChild(metadiv);
+    message.appendChild(metaDiv);
 
     return message;
 }
@@ -378,17 +390,14 @@ function updateLike(like: string): string {
 }
 
 async function showMessageDetails(messageId: number) {
-    const mainFeed: HTMLDivElement = document.getElementById(
-        "main-feed"
-    ) as HTMLDivElement;
-    const messageDetailView = document.getElementById(
-        "message-detail-view"
-    ) as HTMLDivElement;
 
     container.parentElement!.style.display = "none";
     loadMore.style.display = "none";
 
     mainFeed.style.display = "none";
+
+    messageForm.style.display="none"
+    
 
     messageDetail.innerHTML = "";
     comments.innerHTML = "";
@@ -435,17 +444,13 @@ async function showMessageDetails(messageId: number) {
 }
 
 function showMessages() {
-    const mainFeed: HTMLDivElement = document.getElementById(
-        "main-feed"
-    ) as HTMLDivElement;
-    const messageDetailView = document.getElementById(
-        "message-detail-view"
-    ) as HTMLDivElement;
+
 
     container.parentElement!.style.display = "block";
     loadMore.style.display = "block";
 
     mainFeed.style.display = "block";
+    messageForm.style.display="block";
 
     messageDetail.innerHTML = "";
     comments.innerHTML = "";
@@ -462,6 +467,9 @@ function showMessages() {
 submit.addEventListener("click", async (e: Event) => {
     e.preventDefault();
     sendMessageAPI(divcontent.value, divusername.value);
+    divcontent.value="";
+    divusername.value="";
+    displaymessageAPI();
 });
 
 container.addEventListener("click", async (e: Event) => {
