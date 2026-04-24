@@ -1,4 +1,3 @@
-# Prototype de EKLOR
+# EKLOR Prototype
 
-
-Le Prototype d'EKLOR, QUi inclue un affichage détaillé avec des commentaires, gestion de likes, d'avatar et bien plus !
+Prototype , with detailled comments, likes, profile pictures et much more !
